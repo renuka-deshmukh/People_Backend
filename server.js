@@ -1,6 +1,7 @@
 const express = require('express')
 const cors = require('cors');
 const peopleRoute = require('./routes/peopleRoute');
+const userRoute = require('./routes/userRoute');
 require("dotenv").config()
 
 
@@ -14,4 +15,6 @@ app.use(cors());
 app.get('/', (req, res) => res.send('Hello World!'))
 
 app.use('/people', peopleRoute)
+app.use('/user', userRoute)
+
 app.listen(PORT, () => console.log(`Example app listening on port ${PORT}!`))
