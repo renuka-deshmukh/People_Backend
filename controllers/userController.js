@@ -19,19 +19,10 @@ async function register(req, res) {
     const user = await User.create({
       name,
       email,
-      password,
-      role: "User", 
+      password
     });
 
-    res.status(200).send({
-      success: true,
-      msg: "Registered successfully",
-      user: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-      },
+    res.status(200).send({success: true, msg: "Registered successfully", user
     });
 
   } catch (error) {
@@ -51,12 +42,13 @@ async function login(req, res) {
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) return res.status(401).send({ msg: "Invalid Credentials" })
 
-        const token = jwt.sign({ id: user.id, role: user.role }, process.env.SECREATE_KEY, { expiresIn: '1h' });
+        const token = jwt.sign({ id: user.id }, process.env.SECREATE_KEY, { expiresIn: '1h' });
 
         res.status(200).send({
-            msg: "Login Successfull",
-            token: token,
-            success: true
+            success: true,
+      msg: "Login successful",
+      token,
+      user: { id: user.id, name: user.name, email: user.email },
         });
 
     } catch (error) {
@@ -65,23 +57,21 @@ async function login(req, res) {
 
 }
 
-async function getUserInfo(req, res) {
-    const id = req.params.id;
-    try {
-        const user = await User.findByPk(id)
-        if (!user) {
-            return res.status(404).json({ success: false, msg: "User not found" });
-        }
-        res.status(200).send({ success: true, user })
+const getMe = async (req, res) => {
+  try {
+    const user = await User.findByPk(req.user.id, {
+      attributes: ["id", "name", "email"]
+    });
+    if (!user) return res.status(404).send({ msg: "User not found" });
+    res.status(200).send({ success: true, user });
+  } catch (error) {
+    res.status(500).send({ msg: "Server error", error: error.message });
+  }
+};
 
-    } catch (error) {
-        res.status(500).send({ msg: 'server error' })
-    }
-
-}
 
 module.exports = {
     register,
     login,
-    getUserInfo
+    getMe
 }

@@ -18,15 +18,6 @@ const protect = (req, res, next) => {
 };
 
 
-const adminOnly = (req, res, next) => {
-    if (req.user.role !== "Admin") {
-        return res.status(403).send({ msg: " Access denied: Admins only" });
-    }
-    next();
-
-};
-
 module.exports = {
-    protect,
-    adminOnly
+    protect
 }
